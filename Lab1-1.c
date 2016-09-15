@@ -21,7 +21,7 @@ int main(void) {
 	scanf("%f",&radius);
 	area = PI*radius*radius; /* Calculates area */
 	printf ("The area of the circle is %.2f", area);
-	printf ("The area of the circle is %.2f", area);
+	printf ("The new area of the circle is %.2f", area);
 
 	return EXIT_SUCCESS;
 }
