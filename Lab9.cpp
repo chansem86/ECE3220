@@ -1,7 +1,8 @@
 
-
- /* File:   Lab9.cpp */
-
+/* 
+ * File:   Lab9.cpp
+ * Author: Chanse and Jonathan
+ */
 #include <cstdlib>
 #include <cstdio>
 #include <iostream>
@@ -25,7 +26,7 @@ public:
     ~Signal();
     void menu();
     void operator+(double oFFset);
-    void operator*(int scaler);
+    void operator*(double scaler);
     void operation(int choice);
     void offset(double oFFset);
     void scale(double scaler);
@@ -33,23 +34,26 @@ public:
     void center();
     void sig_Info();
     void save_File(string name);
-    vector<double> getData(){
+    vector<double> getData() {
         return data;
     }
-    int getLength(){
+    int getLength() {
         return length;
     }
-    double getMaximum(){
+    void setLength(int len){
+        length = len;
+    }
+    double getMaximum() {
         maximum();
         return max;
     }
-    void setMax(double mAx){
+    void setMax(double mAx) {
         max = mAx;
     }
-    double getAvg(){
+    double getAvg() {
         return average();
     }
-    void setAvg(double avg){
+    void setAvg(double avg) {
         aVerage = avg;
     }
     void setData(vector<double> data1, vector<double> data2);
@@ -58,18 +62,15 @@ public:
 Signal::Signal() { //This is the default constructor that initialize the
     length = 0; //members of the constructor.
     max = 0;
-    aVerage=0;
-    vector<double> data;
 }
 
 Signal::Signal(int num) { //The constructor takes in an integer value
-    aVerage=0;
-	string ext = ".txt";
-    string file = "Raw_data_";
-    file.push_back(num);
-    file = file + ext;//Declare variables for the
-    //int i; //constructor
-    //sprintf(file, "Raw_data_%d.txt", num);
+    Signal();
+    char fileName[20] = {'\0'};
+    string file; //Declare variables for the
+    int i; //constructor
+    sprintf(fileName, "Raw_data_%d.txt", num);
+    file = fileName;
     FILE *filE = fopen(file.c_str(), "r"); //Open chosen file
     if (filE == NULL) { //Check if file opens
         printf("Error! File couldn't be open!");
@@ -77,22 +78,17 @@ Signal::Signal(int num) { //The constructor takes in an integer value
     }
     double info;
     fscanf(filE, "%d %lf", &length, &max); //Stores the values from file to
-    vector<double> data[length]; //corresponding members of the
-    while (!feof(filE)) { //constructor.
+    while (!feof(filE)) { //corresponding members of the constructor.
         fscanf(filE, "%lf\n", &info);
-
-
-
+        data.push_back(info);   //Pushes the value on to the corresponding vector
     }
 }
 
-Signal::Signal(string name) { //The constructor takes in an character pointer
-	aVerage=0;
-	Signal();
-    string file = name + ".txt"; //Declare variables for the
-    //int i = 0; //constructor
-    //int num = 0;
-    //sprintf(file, "%s.txt", name); //Concatenate name with file type
+Signal::Signal(string name) { //The constructor takes in an string variable
+    Signal();
+    string file = name + ".txt"; //Concatenate name with file type
+    int i = 0; //Declare variables for the constructor
+    int num = 0;
     FILE *filE = fopen(file.c_str(), "r"); //Open chosen file
     if (filE == NULL) { //Check if file opens
         printf("Error! File couldn't be open!");
@@ -100,11 +96,9 @@ Signal::Signal(string name) { //The constructor takes in an character pointer
     }
     double info;
     fscanf(filE, "%d %lf", &length, &max); //Stores the values from file to
-    //vector<double> data[length]; //corresponding members of the
-    while (!feof(filE)) { //constructor.
+    while (!feof(filE)) { //corresponding members of the constructor.
         fscanf(filE, "%lf\n", &info);
-        data.push_back(info);
-        //getline(filE,data[i++],'\n');
+        data.push_back(info);   //Pushes the value on to the corresponding vector
     }
 }
 
@@ -112,9 +106,9 @@ Signal::~Signal() { //Destructor
 }
 
 double Signal::average() { //This method sums up all the data
-    int i = 0; //in the pointer, divide it by the
-    double total = 0, avg; //length, and return the double
-    while (i < length) { //variable avg.
+    int i = 0; //in the vector, divide it by the length, and return the double
+    double total = 0, avg; //variable avg.
+    while (i < length) { 
         total += data[i];
         i++;
     }
@@ -122,11 +116,11 @@ double Signal::average() { //This method sums up all the data
     return avg;
 }
 
-void Signal::maximum() { //This method finds the maximum
-    int i = 0; //value of the various values in the
-    double mAx = 0; //data pointer and assign the max
-    while (i < length) { //value to the member of the
-        if (data[i] > mAx) { //constructor.
+void Signal::maximum() { //This method finds the maximum value of the various 
+    int i = 0; //values in the data vector and assign the max value to the 
+    double mAx = 0; //member of the constructor.
+    while (i < length) { 
+        if (data[i] > mAx) { 
             mAx = data[i];
         }
         i++;
@@ -134,8 +128,8 @@ void Signal::maximum() { //This method finds the maximum
     max = mAx;
 }
 
-void Signal::menu() { //The menu of operations for the user
-    cout << "Choose an option:\n" //to choose from.
+void Signal::menu() { //The menu of operations for the user to choose from
+    cout << "Choose an option:\n" 
             "1. Signal Info\n"
             "2. Offset\n"
             "3. Scale\n"
@@ -144,23 +138,25 @@ void Signal::menu() { //The menu of operations for the user
             "6. Save Signal\n";
 }
 
-void Signal::operator +(double oFFset){
-    int i = 0;
-    while (i < length){
-        data[i] += oFFset;  //the variable to the values in the data pointer.
+void Signal::operator+(double oFFset) { //This operator overloader adds the
+    int i = 0;  //passed double to the data vector
+    while (i < length) {
+        data[i] += oFFset; 
+        i++;
     }
 }
 
-void Signal::operator *(int scaler){
-    int i = 0;
-    while(i < length){
-        data[i] *= scaler;  //initialize variables the variable to the values in the data
-    }                   //pointer.
+void Signal::operator*(double scaler) { //This operator overloader multiplies 
+    int i = 0;  //the passed double to the data vector
+    while (i < length) {
+        data[i] *= scaler;
+        i++;
+    }
 }
 
 void Signal::operation(int choice) { //This method carries out the desired
-    double oFFset, scaler; //operation annotation using an
-    string file = "Raw_data_13"; //switch statement
+    double oFFset, scaler; //operation annotation using an switch statement
+    string file = "Raw_data_13"; 
     switch (choice) {
         case 1:
             sig_Info();
@@ -169,14 +165,12 @@ void Signal::operation(int choice) { //This method carries out the desired
             cout << "How much do you want to offset your signal?:";
             cin >> oFFset;
             offset(oFFset);
-            //operator +(oFFset);
             maximum();
             break;
         case 3:
             cout << "How much do you want to scale your signal by?:";
             cin >> scaler;
             scale(scaler);
-            //operator *(scaler);
             maximum();
             break;
         case 4:
@@ -196,42 +190,34 @@ void Signal::operation(int choice) { //This method carries out the desired
     }
 }
 
-void Signal::offset(double oFFset) { //Takes in an double variable and adds
-    operator+(oFFset);  //the variable to the values in the data pointer.
+void Signal::offset(double oFFset) { //Takes in an double variable and calls an
+    operator+(oFFset); //operator overloader.
 }
 
-void Signal::scale(double scaler) { //Takes in an double variable and multiply
-    operator*(scaler);  //initialize variables the variable to the values in the data
-}                        //pointer.
-void Signal::normal() { //Takes the max and divides it by the
-    //int i = 0; //initialize variables   //values in the data pointer.
-    /*while (i < length) {
-        data[i] /= max;
-        i++;
-    }*/
-    operator *(1/max);
+void Signal::scale(double scaler) { //Takes in an double variable and calls an
+    operator*(scaler); //operator overloader.
 }
 
-void Signal::center() { //Takes the average and subtracts it by 
-    //int i = 0; //initialize variables   //the values in the data pointer
-    double avg = average();
-    /*while (i < length) {
-        data[i] -= avg;
-        i++;
-    }*/
-    operator +(-(avg));
+void Signal::normal() { //Calls the maximum function and calls an operator
+    maximum();  //overloader.
+    operator*(1 / max);
 }
 
-void Signal::sig_Info() { //Prints the length of the signal,
-    cout << "Length: " << length << endl; //the maximum, and the average
+void Signal::center() { //Calls the average function and assigns the value to
+    double avg = average(); //an double variable and calls an operator
+    operator+(-(avg));  //overloader.
+}
+
+void Signal::sig_Info() { //Prints the length of the signal, the maximum, and
+    cout << "Length: " << length << endl; //the average
     cout << "Maximum: " << max << endl;
     cout << "Average: " << average() << endl;
 }
 
 void Signal::save_File(string name) { //This method takes in an string and
-    string ext = ".txt";
-    string fIle = name + ext; //concatenate the string to the file 
-    int i = 0; //type
+    string ext = ".txt"; //writes the value of the vector to an .txt file.
+    string fIle = name + ext; //concatenate the string to the file type
+    int i = 0; 
     FILE* file = fopen(fIle.c_str(), "w");
     if (file == NULL) { //Check if file opens
         printf("Error! File couldn't be open!");
@@ -243,30 +229,33 @@ void Signal::save_File(string name) { //This method takes in an string and
         i++;
     }
     fclose(file);
-    cout << "You have just saved the signal to the file " << fIle; //Prompts on success.
+    cout << "You have just saved the signal to the file " << fIle << endl; //Prompts on success.
 }
 
-void Signal::setData(vector<double> data1, vector<double> data2){
-    int i = 0;
-    while (i < length){
-        data[i] = data1[i] + data2[i];
+void Signal::setData(vector<double> data1, vector<double> data2) { //This method
+    int i = 0;  //takes in two vectors and returns an single vector. 
+    while (i < length) {
+        data.push_back(data1[i] + data2[i]);
         i++;
     }
 }
 
-Signal operator +(Signal a, Signal b){
-    Signal temp;
-    //int i = 0;
-    double avg1 = a.getAvg(), avg2 = b.getAvg();
-    if (a.getLength() == b.getLength())
-        temp.setData(a.getData(),b.getData()); 
-    if (a.getMaximum() > b.getMaximum())
-        temp.setMax(a.getMaximum());
+Signal operator+(Signal a, Signal b) {  //This  operator overloader takes two
+    Signal temp;    //signals and adds them up if the signals are the same length
+    int i = 0;  //returns the maximum value of the two vectors and return the
+    double avg1 = a.getAvg(), avg2 = b.getAvg();    //average of the two signals.
+    if (a.getLength() == b.getLength()) {
+        temp.setLength(a.getLength());
+        temp.setData(a.getData(), b.getData());
+        if (a.getMaximum() > b.getMaximum())
+            temp.setMax(a.getMaximum());
+        else
+            temp.setMax(b.getMaximum());
+        temp.setAvg((avg1 + avg2) / 2);
+        return temp;
+    }
     else
-        temp.setMax(b.getMaximum());
-    temp.setAvg((avg1 + avg2)/2);
-    return 0;
-
+        cout << "Sorry, we can only add signals of the same length." << endl;
 }
 
 int main(int argc, char** argv) {
@@ -280,15 +269,12 @@ int main(int argc, char** argv) {
             signal1.menu();
             cin >> choice;
             signal1.operation(choice);
-
-            cout << "please enter the file name of the second signal:";
-            cin >> input;
-            Signal signal2(input);
-            Signal sigSum = signal1 + signal2;
-            sigSum.sig_Info();
-
-
         }
+            cout << "Please enter the file name of the second signal:"; //Prompts the user
+            cin >> input;
+            Signal signal2(input);  //Call an second instance of Signal
+            Signal sigSum = signal1 + signal2;  //Call the operator overloader
+            sigSum.sig_Info();  //Print the information of the signal
     } else if (argv[1][0] == '-' && argv[1][1] == 'n') { //Check for fie number
         file_num = atoi(argv[2]);
         Signal signal1(file_num); //Creates an object
@@ -297,6 +283,11 @@ int main(int argc, char** argv) {
             cin >> choice;
             signal1.operation(choice);
         }
+         cout << "Please enter the file name of the second signal:"; //Prompts the user
+            cin >> input;
+            Signal signal2(input);  //Call an second instance of Signal
+            Signal sigSum = signal1 + signal2;  //Call the operator overloader
+            sigSum.sig_Info();  //Print the information of the signal
     } else if (argv[1][0] == '-' && argv[1][1] == 'f') { //Check for file name
         Signal signal1(argv[2]); //Creates an object
         while (choice != 6) {
@@ -304,6 +295,11 @@ int main(int argc, char** argv) {
             cin >> choice;
             signal1.operation(choice);
         }
+         cout << "Please enter the file name of the second signal:"; //arguments
+            cin >> input;
+            Signal signal2(input);  //Call an second instance of Signal
+            Signal sigSum = signal1 + signal2;  //Call the operator overloader
+            sigSum.sig_Info();  //Print the information of the signal
     } else { //Handles invalid command line commands
         std::cout << "Invalid argument.\n The program either take -n followed by an number of -f followed by a filename.\n Or no arguments at all!";
         return (1);
